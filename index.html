@@ -1,1 +1,169 @@
-hello world
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Flashcards: An SRS Implementation</title>
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
+
+	<body class="">
+		<header class="header">
+			<h1>Flashcards:</h1>
+			<h3>An SRS Implementation</h3>
+		</header>
+		<section class="deckBar">
+			<h3>DECKS</h3>
+			<input id="upload" type="file" multiple="multiple" />
+			<a class="newDeck button">Create New</a>
+			<div class="divideBar"></div>
+			<div class="deckIcon hidden button" id="iconTemplate">
+				<a class="deckText">Template</a>
+				<img
+					src="images/downArrow.png"
+					class="download"
+					width="10"
+					alt="Download Deck"
+				/>
+			</div>
+		</section>
+		<section class="deckDisplay">
+			<div class="deckTest hidden" id="testTemplate">
+				<img
+					src="images/editPencil.png"
+					class="editTestCard"
+					width="15"
+					alt="Edit this Flashcard"
+				/>
+				<div class="testCardFront testSide"></div>
+				<div class="testCardSecretFront testSide"></div>
+				<div class="testCardBack testSide"></div>
+				<div class="testCardSecretBack testSide"></div>
+				<div class="testResponseContainer">
+					<a class="testRevealButton button">Show Answer</a>
+					<div class="testResponseGrades">
+						<a class="testResponseButton button">1</a>
+						<a class="testResponseButton button">2</a>
+						<a class="testResponseButton button">3</a>
+						<a class="testResponseButton button">4</a>
+						<a class="testResponseButton button">5</a>
+					</div>
+				</div>
+			</div>
+			<div class="deckView hidden" id="viewTemplate">
+				<h3>Deck Name</h3>
+				<a class="deck editButton button" data-deckid="0">Edit this deck</a>
+				<div class="scoringSection">
+					<h4>Scoring Summary</h4>
+					<div data-id="count1" class="viewCounts">1: 0</div>
+					<div data-id="count2" class="viewCounts">2: 0</div>
+					<div data-id="count3" class="viewCounts">3: 0</div>
+					<div data-id="count4" class="viewCounts">4: 0</div>
+					<div data-id="count5" class="viewCounts">5: 0</div>
+					<div data-id="countTotal" class="viewCounts">Total: 0</div>
+				</div>
+				<div>
+					<a class="toggleFront toggleDeckShow toggleShowSelected button"
+						>Show Front</a
+					>&lt;-&gt;<a class="toggleBack toggleDeckShow button">Show Back</a>
+				</div>
+				<a class="deck learnButton button" data-deckid="0">Learn this deck</a>
+			</div>
+			<div class="deckEdit hidden" id="editTemplate">
+				<h3 class="deckName">Deck Name</h3>
+				<img
+					src="images/editPencil.png"
+					class="editDeckName actionIcon"
+					width="15"
+					alt="Edit Deck Title"
+				/>
+				<input class="inputDeckName hidden" value="Deck Name" />
+				<div>
+					<div class="shuffleScore">1</div>
+					<a
+						data-id="edit11"
+						class="toggleShuffle shuffle-11 toggleShowSelected button"
+						>&nbsp;</a
+					>
+					<a data-id="edit12" class="toggleShuffle shuffleN1 button">40</a>
+					<a data-id="edit13" class="toggleShuffle shuffle01 button">&nbsp;</a>
+				</div>
+				<div>
+					<div class="shuffleScore">2</div>
+					<a
+						data-id="edit21"
+						class="toggleShuffle shuffle-12 toggleShowSelected button"
+						>&nbsp;</a
+					>
+					<a data-id="edit22" class="toggleShuffle shuffleN2 button">20</a>
+					<a data-id="edit23" class="toggleShuffle shuffle02 button">&nbsp;</a>
+				</div>
+				<div>
+					<div class="shuffleScore">3</div>
+					<a
+						data-id="edit31"
+						class="toggleShuffle shuffle-13 toggleShowSelected button"
+						>&nbsp;</a
+					>
+					<a data-id="edit32" class="toggleShuffle shuffleN3 button">10</a>
+					<a data-id="edit33" class="toggleShuffle shuffle03 button">&nbsp;</a>
+				</div>
+				<div>
+					<div class="shuffleScore">4</div>
+					<a
+						data-id="edit41"
+						class="toggleShuffle shuffle-14 toggleShowSelected button"
+						>&nbsp;</a
+					>
+					<a data-id="edit42" class="toggleShuffle shuffleN4 button">5</a>
+					<a data-id="edit43" class="toggleShuffle shuffle04 button">&nbsp;</a>
+				</div>
+				<div>
+					<div class="shuffleScore">5</div>
+					<a data-id="edit51" class="toggleShuffle shuffle-15 button">&nbsp;</a>
+					<a data-id="edit52" class="toggleShuffle shuffleN5 button">1</a>
+					<a
+						data-id="edit53"
+						class="toggleShuffle shuffle05 toggleShowSelected button"
+						>&nbsp;</a
+					>
+				</div>
+				<a class="deck alterButton button" data-deckid="0"
+					>Edit individual Cards</a
+				>
+				<a class="deck resetButton button" data-deckid="0">Reset scores to 1</a>
+				<br />
+				<br />
+				<a class="deck deleteButton button" data-deckid="0">Delete this Deck</a>
+			</div>
+			<div class="deckAlter hidden" id="alterTemplate">
+				<div class="alterCard" data-currentcard="-1">
+					<a class="newButton button">Enter New Card</a>
+					<input class="alterCardFront" type="text" tabindex="1" />
+					<input class="alterCardBack" type="text" tabindex="2" />
+					<div class="alterResponseContainer">
+						<div class="testResponseGrades">
+							<a class="alterScoreButton button" tabindex="3">1</a>
+							<a class="alterScoreButton button" tabindex="4">2</a>
+							<a class="alterScoreButton button" tabindex="5">3</a>
+							<a class="alterScoreButton button" tabindex="6">4</a>
+							<a class="alterScoreButton button" tabindex="7">5</a>
+						</div>
+					</div>
+				</div>
+				<div class="alterList"><div id="scrollbox"></div></div>
+			</div>
+		</section>
+		<div id="modal" class="hidden">
+			<div id="modal-textbox">
+				<a id="close" href="#">Close</a>
+				<h2>You Did It!</h2>
+				<p>
+					You memorized all of the cards! Try learning another set of cards.
+				</p>
+			</div>
+		</div>
+		<script src="script/filesaver.js"></script>
+		<script src="script/uscapitals.js"></script>
+		<script src="script/script.js"></script>
+	</body>
+</html>

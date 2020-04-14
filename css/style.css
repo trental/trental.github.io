@@ -1,0 +1,276 @@
+body {
+	font-size: 1.5rem;
+	text-align: center;
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+	width: 100vw;
+	box-sizing: border-box;
+	display: grid;
+	grid-template-rows: 100px 400px 1fr;
+}
+
+header {
+	background: #11697f;
+}
+
+.deckBar {
+	background: #f28f3b;
+}
+
+.deckDisplay {
+	/* background-image: url('images/flashCards.jpeg');
+	background-position: center;
+	background: white; */
+	background: url('../images/flashCards.jpeg') center;
+	background-size: cover;
+}
+
+.button {
+	background: #c8553d;
+	color: #c5c5c5;
+	display: block;
+	margin: 3px;
+	border: 2px solid #c5c5c5;
+	border-radius: 5px;
+}
+
+.button:hover {
+	border: 2px solid white;
+	color: white;
+	cursor: pointer;
+}
+
+.toggleDeckShow {
+	width: 150px;
+	display: inline-block;
+}
+
+.testSide {
+	border: 2px solid #11697f;
+}
+
+.testResponseButton {
+	width: 50px;
+	display: inline-block;
+}
+
+h1,
+h3,
+h4 {
+	display: inline-block;
+	font-size: 60px;
+	color: #c5c5c5;
+	text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+	margin: auto;
+	padding: 10px;
+}
+
+h3 {
+	font-size: 40px;
+}
+
+h4 {
+	font-size: 25px;
+	text-shadow: none;
+}
+
+.scoringSection {
+	background: #11697f;
+	color: #c5c5c5;
+	width: 95%;
+	margin: auto;
+	border: 2px solid #c5c5c5;
+	border-radius: 5px;
+}
+
+.shuffleScore {
+	display: inline-block;
+	color: #c5c5c5;
+	text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+}
+
+#modal {
+	background-color: rgba(0, 0, 0, 0.4);
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	z-index: 1;
+	overflow: auto;
+}
+
+#modal-textbox {
+	background-color: white;
+	height: 350px;
+	width: 550px;
+	border-radius: 2px;
+	margin: 150px auto;
+	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.alterScoreButton {
+	width: 50px;
+	display: inline-block;
+}
+.inputDeckName {
+	font-size: 40px;
+	width: 90%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.deckView {
+	background: #f28f3b;
+	margin: 5px auto;
+	width: 450px;
+	height: 70%;
+}
+
+.deckTest {
+	background: #f28f3b;
+	margin: 10px auto;
+	width: 450px;
+	height: 90%;
+}
+
+.deckEdit {
+	background: #f28f3b;
+	margin: 10px auto;
+	width: 450px;
+	height: 600px;
+}
+
+.deckAlter {
+	background: #f28f3b;
+	margin: 10px auto;
+	width: 920px;
+	height: 700px;
+	display: flex;
+}
+.alterCard {
+	background: #829191;
+	margin: 5px auto;
+	width: 400px;
+	height: 680px;
+}
+.alterList {
+	background: #829191;
+	margin: 5px auto;
+	width: 400px;
+	height: 680px;
+}
+
+#scrollbox {
+	overflow: scroll;
+	font-size: 20px;
+	width: 400px;
+	height: 670px;
+}
+
+.scrollCard {
+}
+
+.testCardFront {
+	background: white;
+	margin: 10px auto;
+	width: 90%;
+	height: 40%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.testCardBack {
+	background: white;
+	margin: 10px auto;
+	width: 90%;
+	height: 40%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.alterCardFront {
+	background: white;
+	margin: 10px auto;
+	width: 90%;
+	height: 40%;
+	font-size: 20px;
+	text-align: center;
+}
+
+.alterCardBack {
+	background: white;
+	margin: 10px auto;
+	width: 90%;
+	height: 40%;
+	font-size: 20px;
+	text-align: center;
+}
+
+.testCardSecretFront {
+	background: #aaaaaa;
+	margin: 10px auto;
+	width: 90%;
+	height: 40%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.testCardSecretBack {
+	background: #aaaaaa;
+	margin: 10px auto;
+	width: 90%;
+	height: 40%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.newDeck {
+}
+
+.divideBar {
+	width: 90%;
+	height: 2px;
+	border: 1px solid #11697f;
+	background: #11697f;
+	margin: auto;
+}
+
+.minimize {
+	grid-template-rows: 100px 28px 1fr;
+}
+
+.toggleShuffle {
+	width: 75px;
+	margin: 5px;
+	display: inline-block;
+	border: 2px solid lightgrey;
+}
+
+.toggleShowSelected {
+	background: #11697f;
+}
+
+.hidden {
+	display: none;
+}
+
+@media (min-width: 600px) {
+	body {
+		grid-template-columns: 1fr 5fr;
+		grid-template-rows: 100px 1fr 0;
+	}
+	.header {
+		grid-column: 1 / span 2;
+	}
+	.minimize {
+		grid-template-columns: 40px 5fr;
+		grid-template-rows: 100px 1fr 0;
+	}
+}
