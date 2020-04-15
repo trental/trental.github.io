@@ -18,10 +18,12 @@ header {
 	background: #f28f3b;
 }
 
-.deckDisplay {
-	/* background-image: url('images/flashCards.jpeg');
-	background-position: center;
-	background: white; */
+#upload {
+	display: block;
+	margin: 2px auto;
+}
+
+.display {
 	background: url('../images/flashCards.jpeg') center;
 	background-size: cover;
 }
@@ -46,11 +48,11 @@ header {
 	display: inline-block;
 }
 
-.testSide {
+.learnBox {
 	border: 2px solid #11697f;
 }
 
-.testResponseButton {
+.learnDeckResponseButton {
 	width: 50px;
 	display: inline-block;
 }
@@ -110,10 +112,11 @@ h4 {
 	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 }
 
-.alterScoreButton {
+.viewCardsResponseButton {
 	width: 50px;
 	display: inline-block;
 }
+
 .inputDeckName {
 	font-size: 40px;
 	width: 90%;
@@ -129,7 +132,7 @@ h4 {
 	height: 70%;
 }
 
-.deckTest {
+.learnDeck {
 	background: #f28f3b;
 	margin: 10px auto;
 	width: 450px;
@@ -143,27 +146,44 @@ h4 {
 	height: 600px;
 }
 
-.deckAlter {
+nav {
+	background: #829191;
+}
+
+.navButton {
+	display: inline-block;
+	width: 200px;
+}
+
+.viewDeck {
+	background: #f28f3b;
+	margin: 10px auto;
+	width: 400px;
+	height: 700px;
+}
+
+.viewCards {
 	background: #f28f3b;
 	margin: 10px auto;
 	width: 920px;
 	height: 700px;
 	display: flex;
 }
-.alterCard {
+
+.cardView {
 	background: #829191;
 	margin: 5px auto;
 	width: 400px;
 	height: 680px;
 }
-.alterList {
+.cardList {
 	background: #829191;
 	margin: 5px auto;
 	width: 400px;
 	height: 680px;
 }
 
-#scrollbox {
+#viewCardsScrollBox {
 	overflow: scroll;
 	font-size: 20px;
 	width: 400px;
@@ -173,7 +193,7 @@ h4 {
 .scrollCard {
 }
 
-.testCardFront {
+.learnDeckFront {
 	background: white;
 	margin: 10px auto;
 	width: 90%;
@@ -183,7 +203,7 @@ h4 {
 	align-items: center;
 }
 
-.testCardBack {
+.learnDeckBack {
 	background: white;
 	margin: 10px auto;
 	width: 90%;
@@ -193,7 +213,7 @@ h4 {
 	align-items: center;
 }
 
-.alterCardFront {
+.viewCardsFront {
 	background: white;
 	margin: 10px auto;
 	width: 90%;
@@ -202,7 +222,7 @@ h4 {
 	text-align: center;
 }
 
-.alterCardBack {
+.viewCardsBack {
 	background: white;
 	margin: 10px auto;
 	width: 90%;
@@ -211,7 +231,7 @@ h4 {
 	text-align: center;
 }
 
-.testCardSecretFront {
+.learnDeckFrontSecret {
 	background: #aaaaaa;
 	margin: 10px auto;
 	width: 90%;
@@ -221,7 +241,7 @@ h4 {
 	align-items: center;
 }
 
-.testCardSecretBack {
+.learnDeckBackSecret {
 	background: #aaaaaa;
 	margin: 10px auto;
 	width: 90%;
@@ -229,9 +249,6 @@ h4 {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-}
-
-.newDeck {
 }
 
 .divideBar {

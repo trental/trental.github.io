@@ -13,7 +13,12 @@
 		</header>
 		<section class="deckBar">
 			<h3>DECKS</h3>
-			<input id="upload" type="file" multiple="multiple" />
+			<div class="divideBar"></div>
+			<div class="uploadSection">
+				Upload Decks
+				<input id="upload" type="file" multiple="multiple" />
+			</div>
+			<div class="divideBar"></div>
 			<a class="newDeck button">Create New</a>
 			<div class="divideBar"></div>
 			<div class="deckIcon hidden button" id="iconTemplate">
@@ -26,32 +31,43 @@
 				/>
 			</div>
 		</section>
-		<section class="deckDisplay">
-			<div class="deckTest hidden" id="testTemplate">
+		<section class="display">
+			<nav class="navigation">
+				<a class="viewDeckButton button navButton">View Deck</a>
+				<a class="learnDeckButton button navButton">Learn Deck</a>
+				<a class="viewCardsButton button navButton">View Cards</a>
+			</nav>
+			<div class="learnDeck hidden">
 				<img
 					src="images/editPencil.png"
-					class="editTestCard"
+					class="learnDeckEdit"
 					width="15"
 					alt="Edit this Flashcard"
 				/>
-				<div class="testCardFront testSide"></div>
-				<div class="testCardSecretFront testSide"></div>
-				<div class="testCardBack testSide"></div>
-				<div class="testCardSecretBack testSide"></div>
-				<div class="testResponseContainer">
-					<a class="testRevealButton button">Show Answer</a>
-					<div class="testResponseGrades">
-						<a class="testResponseButton button">1</a>
-						<a class="testResponseButton button">2</a>
-						<a class="testResponseButton button">3</a>
-						<a class="testResponseButton button">4</a>
-						<a class="testResponseButton button">5</a>
+				<div class="learnDeckFront learnBox"></div>
+				<div class="learnDeckFrontSecret learnBox"></div>
+				<div class="learnDeckBack learnBox"></div>
+				<div class="learnDeckBackSecret learnBox"></div>
+				<div class="learnDeckResponseContainer">
+					<a class="learnDeckRevealButton button" id="reveal">Show Answer</a>
+					<div class="learnDeckResponseGrades">
+						<a class="learnDeckResponseButton button" id="res1">1</a>
+						<a class="learnDeckResponseButton button" id="res2">2</a>
+						<a class="learnDeckResponseButton button" id="res3">3</a>
+						<a class="learnDeckResponseButton button" id="res4">4</a>
+						<a class="learnDeckResponseButton button" id="res5">5</a>
 					</div>
 				</div>
 			</div>
-			<div class="deckView hidden" id="viewTemplate">
+			<div class="viewDeck hidden" id="viewTemplate">
 				<h3>Deck Name</h3>
-				<a class="deck editButton button" data-deckid="0">Edit this deck</a>
+				<input class="inputDeckName hidden" value="Deck Name" />
+				<img
+					src="images/editPencil.png"
+					class="editDeckName actionIcon"
+					width="15"
+					alt="Edit Deck Title"
+				/>
 				<div class="scoringSection">
 					<h4>Scoring Summary</h4>
 					<div data-id="count1" class="viewCounts">1: 0</div>
@@ -61,22 +77,14 @@
 					<div data-id="count5" class="viewCounts">5: 0</div>
 					<div data-id="countTotal" class="viewCounts">Total: 0</div>
 				</div>
+				<div class="divideBar"></div>
 				<div>
 					<a class="toggleFront toggleDeckShow toggleShowSelected button"
 						>Show Front</a
 					>&lt;-&gt;<a class="toggleBack toggleDeckShow button">Show Back</a>
 				</div>
-				<a class="deck learnButton button" data-deckid="0">Learn this deck</a>
-			</div>
-			<div class="deckEdit hidden" id="editTemplate">
-				<h3 class="deckName">Deck Name</h3>
-				<img
-					src="images/editPencil.png"
-					class="editDeckName actionIcon"
-					width="15"
-					alt="Edit Deck Title"
-				/>
-				<input class="inputDeckName hidden" value="Deck Name" />
+				<div class="divideBar"></div>
+
 				<div>
 					<div class="shuffleScore">1</div>
 					<a
@@ -127,30 +135,30 @@
 						>&nbsp;</a
 					>
 				</div>
-				<a class="deck alterButton button" data-deckid="0"
-					>Edit individual Cards</a
-				>
+				<div class="divideBar"></div>
 				<a class="deck resetButton button" data-deckid="0">Reset scores to 1</a>
-				<br />
-				<br />
+				<div class="divideBar"></div>
 				<a class="deck deleteButton button" data-deckid="0">Delete this Deck</a>
 			</div>
-			<div class="deckAlter hidden" id="alterTemplate">
-				<div class="alterCard" data-currentcard="-1">
-					<a class="newButton button">Enter New Card</a>
-					<input class="alterCardFront" type="text" tabindex="1" />
-					<input class="alterCardBack" type="text" tabindex="2" />
-					<div class="alterResponseContainer">
-						<div class="testResponseGrades">
-							<a class="alterScoreButton button" tabindex="3">1</a>
-							<a class="alterScoreButton button" tabindex="4">2</a>
-							<a class="alterScoreButton button" tabindex="5">3</a>
-							<a class="alterScoreButton button" tabindex="6">4</a>
-							<a class="alterScoreButton button" tabindex="7">5</a>
+
+			<div class="viewCards hidden">
+				<div class="cardView" data-currentcard="-1">
+					<a class="viewCardsNewButton button">Enter New Card</a>
+					<input class="viewCardsFront" type="text" tabindex="1" />
+					<input class="viewCardsBack" type="text" tabindex="2" />
+					<div class="viewCardsResponseContainer">
+						<div class="viewCardsResponseGrades">
+							<a class="viewCardsResponseButton button" tabindex="3">1</a>
+							<a class="viewCardsResponseButton button" tabindex="4">2</a>
+							<a class="viewCardsResponseButton button" tabindex="5">3</a>
+							<a class="viewCardsResponseButton button" tabindex="6">4</a>
+							<a class="viewCardsResponseButton button" tabindex="7">5</a>
 						</div>
 					</div>
 				</div>
-				<div class="alterList"><div id="scrollbox"></div></div>
+				<div class="cardList">
+					<div id="viewCardsScrollBox"></div>
+				</div>
 			</div>
 		</section>
 		<div id="modal" class="hidden">

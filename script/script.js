@@ -1,22 +1,19 @@
-class DeckDisplay {
+let templateDeck = {
+	detail: {
+		title: 'New Deck',
+		shuffle: [-1, -1, 1, 1, 0],
+		showQuestion: true,
+	},
+	cards: [],
+};
+
+class Display {
 	constructor(book) {
-		this.element = document.querySelector('.deckDisplay');
-	}
-
-	hideAll() {
-		let object = this.element.firstElementChild;
-
-		while (object) {
-			object.classList.add('hidden');
-			object = object.nextElementSibling;
-		}
+		this.element = document.querySelector('.display');
 	}
 
 	addDeck(object) {
-		this.element.appendChild(object.test);
-		this.element.appendChild(object.view);
-		this.element.appendChild(object.edit);
-		this.element.appendChild(object.alter);
+		// console.log('display.addDeck ' + object);
 	}
 }
 
@@ -36,6 +33,7 @@ class DeckBar {
 
 	addDeck(object) {
 		this.element.appendChild(object.icon);
+		// console.log('deckBar.addDeck ' + object);
 	}
 
 	uploadFiles(ulButtonEvent) {
@@ -62,6 +60,485 @@ class DeckBar {
 			};
 		}
 	}
+
+	removeIcon(deckid) {
+		// console.log('delete ' + deckid);
+		this.element.querySelector(`#deck${deckid}`).remove();
+	}
+
+	refresh(deckid) {
+		let icon = this.element.querySelector(`#deck${deckid}`);
+		icon.firstElementChild.innerText = book.decks[deckid - 1].title;
+	}
+}
+
+class Navigation {
+	constructor(domElement) {
+		this.element = document.querySelector(`.${domElement}`);
+		this.element.onclick = this.onClick.bind(this);
+		this.deckid = 0;
+		this.card;
+	}
+
+	setDeck(deckid) {
+		this.deckid = deckid;
+	}
+
+	onClick(event) {
+		event.preventDefault();
+		const el = event.target;
+		// console.log(el);
+
+		[...this.element.querySelectorAll('.button')].forEach((button) => {
+			// console.log(button);
+			button.classList.remove('toggleShowSelected');
+		});
+
+		if (this.deckid != 0) {
+			if (el.classList.contains('learnDeckButton')) {
+				learnDeck.presentCard(
+					this.deckid,
+					book.decks[this.deckid - 1].currentCard,
+					book.decks[this.deckid - 1].showQuestion
+				);
+				learnDeck.showSelf();
+				viewDeck.hideSelf();
+				viewCards.hideSelf();
+				el.classList.add('toggleShowSelected');
+			} else if (el.classList.contains('viewDeckButton')) {
+				learnDeck.hideSelf();
+				viewDeck.showSelf();
+				viewDeck.refresh(this.deckid);
+				viewCards.hideSelf();
+				el.classList.add('toggleShowSelected');
+			} else if (el.classList.contains('viewCardsButton')) {
+				viewCards.viewCard(
+					this.deckid,
+					book.decks[this.deckid - 1].currentCard
+				);
+				learnDeck.hideSelf();
+				viewDeck.hideSelf();
+				viewCards.showSelf();
+				el.classList.add('toggleShowSelected');
+			}
+		}
+	}
+}
+
+class deckScreen {
+	constructor(domElement) {
+		this.element = document.querySelector(`.${domElement}`);
+		// this.element.onclick = this.onClick;
+		this.element.onclick = this.onClick.bind(this);
+		this.deckid;
+		this.card;
+	}
+
+	onClick(event) {
+		event.preventDefault();
+		const el = event.target;
+		// console.log(el);
+	}
+
+	showSelf() {
+		this.element.classList.remove('hidden');
+	}
+
+	hideSelf() {
+		this.element.classList.add('hidden');
+	}
+}
+
+class ViewDeck extends deckScreen {
+	constructor(domElement) {
+		super(domElement);
+
+		this.viewDeckName = this.element.querySelector('h3');
+		this.viewDeckNameInput = this.element.querySelector('.inputDeckName');
+
+		this.viewDeckScoreCounts = this.element.querySelectorAll('.viewCounts');
+		this.viewDeckToggleFront = this.element.querySelector('.toggleFront');
+		this.viewDeckToggleBack = this.element.querySelector('.toggleBack');
+
+		this.viewDeckShuffleButtons = [];
+		for (let i = 1; i <= 5; i++) {
+			this.viewDeckShuffleButtons.push([]);
+			this.viewDeckShuffleButtons[i - 1].push(
+				this.element.querySelector(`.shuffle-1${i}`)
+			);
+			this.viewDeckShuffleButtons[i - 1].push(
+				this.element.querySelector(`.shuffleN${i}`)
+			);
+			this.viewDeckShuffleButtons[i - 1].push(
+				this.element.querySelector(`.shuffle0${i}`)
+			);
+		}
+	}
+
+	refresh(deckid) {
+		this.deckid = deckid;
+		let deck = book.decks[this.deckid - 1];
+
+		// title
+		this.viewDeckName.innerText = deck.title;
+		this.viewDeckNameInput.value = this.viewDeckName.innerText;
+
+		// counts by score
+		const count = [];
+		let countTotal = 0;
+		for (let i = 1; i <= 5; i++) {
+			const currentCount = deck.cardsWithScore(i).length;
+			count.push(currentCount);
+			countTotal += currentCount;
+		}
+		for (let i = 0; i < this.viewDeckScoreCounts.length; i++) {
+			this.viewDeckScoreCounts[i].innerText = i + 1 + ': ' + count[i];
+		}
+		this.viewDeckScoreCounts[this.viewDeckScoreCounts.length - 1].innerText =
+			'Total: ' + countTotal;
+
+		// option to show card front or back
+		if (deck.showQuestion) {
+			this.viewDeckToggleFront.classList.add('toggleShowSelected');
+			this.viewDeckToggleBack.classList.remove('toggleShowSelected');
+		} else {
+			this.viewDeckToggleFront.classList.remove('toggleShowSelected');
+			this.viewDeckToggleBack.classList.add('toggleShowSelected');
+		}
+
+		// show shuffle button options
+		for (let i = 0; i <= 4; i++) {
+			for (let j = 0; j <= 2; j++) {
+				this.viewDeckShuffleButtons[i][j].classList.remove(
+					'toggleShowSelected'
+				);
+			}
+			if (deck.shuffle[i] == -1) {
+				this.viewDeckShuffleButtons[i][0].classList.add('toggleShowSelected');
+			} else if (deck.shuffle[i] == 0) {
+				this.viewDeckShuffleButtons[i][2].classList.add('toggleShowSelected');
+			} else {
+				this.viewDeckShuffleButtons[i][1].classList.add('toggleShowSelected');
+			}
+		}
+	}
+
+	editDeckName(event) {
+		let deck = book.decks[this.deckid - 1];
+
+		// console.log(deck.title);
+		if (this.viewDeckName.classList.contains('hidden')) {
+			let oldTitle = deck.title;
+			this.viewDeckName.classList.remove('hidden');
+			this.viewDeckNameInput.classList.add('hidden');
+			deck.title = this.viewDeckNameInput.value;
+			this.refresh(this.deckid);
+			deckBar.refresh(this.deckid);
+			storedDecks.deleteDeck(oldTitle);
+		} else {
+			this.viewDeckName.classList.add('hidden');
+			this.viewDeckNameInput.classList.remove('hidden');
+			this.viewDeckNameInput.focus();
+			this.viewDeckNameInput.selectionStart = this.viewDeckNameInput.selectionEnd = this.viewDeckNameInput.value.length;
+		}
+	}
+
+	onClick(event) {
+		let deck = book.decks[this.deckid - 1];
+
+		// shuffle options updated
+		if (event.target.classList.contains('toggleShuffle')) {
+			if (event.target.dataset.id == 'edit11') deck.shuffle[0] = -1;
+			if (event.target.dataset.id == 'edit12')
+				deck.shuffle[0] = parseInt(event.target.innerText, 10);
+			if (event.target.dataset.id == 'edit13') deck.shuffle[0] = 0;
+
+			if (event.target.dataset.id == 'edit21') deck.shuffle[1] = -1;
+			if (event.target.dataset.id == 'edit22')
+				deck.shuffle[1] = parseInt(event.target.innerText, 10);
+			if (event.target.dataset.id == 'edit23') deck.shuffle[1] = 0;
+
+			if (event.target.dataset.id == 'edit31') deck.shuffle[2] = -1;
+			if (event.target.dataset.id == 'edit32')
+				deck.shuffle[2] = parseInt(event.target.innerText, 10);
+			if (event.target.dataset.id == 'edit33') deck.shuffle[2] = 0;
+
+			if (event.target.dataset.id == 'edit41') deck.shuffle[3] = -1;
+			if (event.target.dataset.id == 'edit42')
+				deck.shuffle[3] = parseInt(event.target.innerText, 10);
+			if (event.target.dataset.id == 'edit43') deck.shuffle[3] = 0;
+
+			if (event.target.dataset.id == 'edit51') deck.shuffle[4] = -1;
+			if (event.target.dataset.id == 'edit52')
+				deck.shuffle[4] = parseInt(event.target.innerText, 10);
+			if (event.target.dataset.id == 'edit53') deck.shuffle[4] = 0;
+		} else if (event.target.classList.contains('toggleDeckShow')) {
+			if (event.target.classList.contains('toggleFront')) {
+				deck.showQuestion = true;
+			} else {
+				deck.showQuestion = false;
+			}
+			this.refresh(this.deckid);
+		} else if (event.target.classList.contains('resetButton')) {
+			// reset all cards to score 1
+			deck.resetCards();
+		} else if (event.target.classList.contains('deleteButton')) {
+			storedDecks.deleteDeck(deck.title); // delete the deck from storage
+			deckBar.removeIcon(this.deckid); // remove the icon
+			this.hideSelf(); // hide this screen
+			navigation.deckid = 0;
+			return 'deleted'; // return is here so that execution breaks and deck isn't stored
+		} else if (event.target.classList.contains('editDeckName')) {
+			this.editDeckName();
+		}
+
+		storedDecks.storeDeck(deck.title, deck.dumpDeck());
+		this.refresh(this.deckid);
+	}
+}
+
+class ViewCards extends deckScreen {
+	constructor(domElement) {
+		super(domElement);
+
+		// learnDeck div that shows in display
+		this.viewCardsFront = this.element.querySelector('.viewCardsFront');
+		this.viewCardsBack = this.element.querySelector('.viewCardsBack');
+
+		// buttons for learning, grades then reveal button
+		this.viewCardsResponseButtons = [
+			...this.element.querySelectorAll('.viewCardsResponseButton'),
+		];
+
+		// scroll list showing all cards in deck
+		this.viewCardsScrollBox = this.element.querySelector('#viewCardsScrollBox');
+	}
+
+	viewCard(deckid, card) {
+		this.deckid = deckid;
+		this.card = card;
+
+		if (book.decks[deckid - 1].cards.length > 0) {
+			// show card front and back
+			this.viewCardsFront.value = card.front;
+			this.viewCardsBack.value = card.back;
+
+			// highlight the current score
+			this.viewCardsResponseButtons.forEach((button) =>
+				button.classList.remove('toggleShowSelected')
+			);
+			this.viewCardsResponseButtons[card.score - 1].classList.add(
+				'toggleShowSelected'
+			);
+		} else {
+			this.startNewCard();
+		}
+
+		// show list of cards in the deck and highlight the selected card
+		this.updateScrollList(this.deckid);
+	}
+
+	updateScrollList(deckid) {
+		// empty out scroll list
+		let firstChild = this.viewCardsScrollBox.firstElementChild;
+		while (firstChild) {
+			firstChild.remove();
+			firstChild = this.viewCardsScrollBox.firstElementChild;
+		}
+
+		// populate with current deck
+		let currentCardIndex = book.decks[deckid - 1].cards.indexOf(this.card);
+		let newCardDiv;
+		let delImage;
+		let cards = book.decks[deckid - 1].dumpCards();
+		for (let i = 0; i < cards.length; i++) {
+			// create new list element
+			newCardDiv = document.createElement('div');
+			newCardDiv.innerText = cards[i].front;
+			newCardDiv.dataset.cardid = i;
+			newCardDiv.classList.add('scrollCard');
+			newCardDiv.classList.add('button');
+
+			// add and format delete image
+			delImage = document.createElement('img');
+			delImage.setAttribute('src', 'images/delete.png');
+			delImage.dataset.cardid = i;
+			delImage.style.width = '10px';
+			delImage.style.border = '0';
+			delImage.align = 'right';
+			delImage.style.margin = '5px';
+			delImage.classList.add('deleteCard');
+			newCardDiv.appendChild(delImage);
+
+			// highlight row item if it is the card currently shown in the viewer
+			if (i == currentCardIndex) {
+				newCardDiv.classList.add('toggleShowSelected');
+			}
+
+			// append the list item
+			this.viewCardsScrollBox.appendChild(newCardDiv);
+		}
+	}
+
+	deleteCard(cardId) {
+		book.decks[this.deckid - 1].cards.splice(cardId, 1);
+		this.startNewCard();
+		storedDecks.storeDeck(
+			book.decks[this.deckid - 1].title,
+			book.decks[this.deckid - 1].dumpDeck()
+		);
+	}
+
+	startNewCard() {
+		this.card = -1;
+		this.updateScrollList(this.deckid);
+		this.viewCardsFront.value = '';
+		this.viewCardsBack.value = '';
+		this.viewCardsFront.focus();
+	}
+
+	saveCard(cardId, front, back, score) {
+		let currentDeck = book.decks[this.deckid - 1];
+		currentDeck.cards[cardId].front = front;
+		currentDeck.cards[cardId].back = back;
+		currentDeck.cards[cardId].score = score;
+		storedDecks.storeDeck(currentDeck.title, currentDeck.dumpDeck());
+	}
+
+	onClick(event) {
+		event.preventDefault();
+		const el = event.target;
+
+		if (el.classList.contains('scrollCard')) {
+			this.viewCard(
+				this.deckid,
+				book.decks[this.deckid - 1].cards[el.dataset.cardid]
+			);
+		} else if (el.classList.contains('viewCardsNewButton')) {
+			this.startNewCard();
+		} else if (el.classList.contains('viewCardsResponseButton')) {
+			if (this.card == -1) {
+				book.decks[this.deckid - 1].addCard(
+					this.viewCardsFront.value,
+					this.viewCardsBack.value,
+					parseInt(el.innerText, 10)
+				);
+				this.startNewCard();
+			} else {
+				this.saveCard(
+					book.decks[this.deckid - 1].cards.indexOf(this.card),
+					this.viewCardsFront.value,
+					this.viewCardsBack.value,
+					parseInt(el.innerText, 10)
+				);
+				this.startNewCard();
+			}
+		} else if (el.classList.contains('deleteCard')) {
+			this.deleteCard(el.dataset.cardid);
+			this.startNewCard();
+		}
+	}
+}
+
+class LearnDeck extends deckScreen {
+	constructor(domElement) {
+		super(domElement);
+
+		// learnDeck div that shows in display
+		this.learnDeckFront = this.element.querySelector('.learnDeckFront');
+		this.learnDeckFrontSecret = this.element.querySelector(
+			'.learnDeckFrontSecret'
+		);
+		this.learnDeckBack = this.element.querySelector('.learnDeckBack');
+		this.learnDeckBackSecret = this.element.querySelector(
+			'.learnDeckBackSecret'
+		);
+
+		// buttons for learning, grades then reveal button
+		this.learnDeckResponseButtons = [
+			...this.element.querySelectorAll('.learnDeckResponseButton'),
+		];
+		this.learnDeckResponseGrades = this.element.querySelector(
+			'.learnDeckResponseGrades'
+		);
+		this.learnDeckRevealButton = this.element.querySelector(
+			'.learnDeckRevealButton'
+		);
+	}
+
+	presentCard(deckid, card, showQuestion) {
+		this.deckid = deckid;
+
+		if (book.decks[deckid - 1].cards.length > 0) {
+			this.card = card;
+			this.learnDeckFront.innerHTML = card.front;
+			this.learnDeckBack.innerHTML = card.back;
+
+			// present front or back depending on setting
+			if (showQuestion) {
+				this.learnDeckFront.classList.remove('hidden');
+				this.learnDeckFrontSecret.classList.add('hidden');
+				this.learnDeckBack.classList.add('hidden');
+				this.learnDeckBackSecret.classList.remove('hidden');
+			} else {
+				this.learnDeckFront.classList.add('hidden');
+				this.learnDeckFrontSecret.classList.remove('hidden');
+				this.learnDeckBack.classList.remove('hidden');
+				this.learnDeckBackSecret.classList.add('hidden');
+			}
+
+			// highlight the current score
+			this.learnDeckResponseButtons.forEach((button) =>
+				button.classList.remove('toggleShowSelected')
+			);
+			this.learnDeckResponseButtons[card.score - 1].classList.add(
+				'toggleShowSelected'
+			);
+
+			// hide score buttons but show the reveal button
+			this.learnDeckResponseGrades.classList.add('hidden');
+			this.learnDeckRevealButton.classList.remove('hidden');
+		} else {
+			this.learnDeckFront.classList.add('hidden');
+			this.learnDeckFrontSecret.classList.remove('hidden');
+			this.learnDeckBack.classList.add('hidden');
+			this.learnDeckBackSecret.classList.remove('hidden');
+		}
+	}
+
+	showCard() {
+		// show front and back
+		this.learnDeckFront.classList.remove('hidden');
+		this.learnDeckFrontSecret.classList.add('hidden');
+		this.learnDeckBack.classList.remove('hidden');
+		this.learnDeckBackSecret.classList.add('hidden');
+
+		// hide reveal button and show grade buttons
+		this.learnDeckResponseGrades.classList.remove('hidden');
+		this.learnDeckRevealButton.classList.add('hidden');
+	}
+
+	onClick(event) {
+		event.preventDefault();
+		const el = event.target;
+		if (el.classList.contains('learnDeckRevealButton')) {
+			// if hitting reveal button, show the card q and a and the score buttons
+			this.showCard();
+		} else if (el.classList.contains('learnDeckResponseButton')) {
+			// if hitting a score button, update the card score then show the next card
+			book.decks[this.deckid - 1].scoreCurrentCard(parseInt(el.innerText, 10));
+			this.presentCard(
+				this.deckid,
+				book.decks[this.deckid - 1].currentCard,
+				book.decks[this.deckid - 1].showQuestion
+			);
+		} else if (el.classList.contains('learnDeckEdit')) {
+			learnDeck.hideSelf();
+			viewCards.viewCard(this.deckid, this.card);
+			viewCards.showSelf();
+		}
+		// console.log(el);
+	}
 }
 
 class Deck {
@@ -71,108 +548,75 @@ class Deck {
 		this.showQuestion = newDeck.detail.showQuestion;
 		this.cards = newDeck.cards;
 		this.currentCard = 0;
+		this.id = id;
 
-		// icon that shows in deckBar
+		// each deck has an icon in the deckBar
 		const iconTemplate = document.querySelector('#iconTemplate');
 		this.icon = iconTemplate.cloneNode(true);
+		// console.log(this.icon);
 		this.icon.onclick = this.onClickIcon.bind(this);
 
-		const newImage = document.createElement('img');
 		this.icon.classList.remove('hidden');
 		this.icon.querySelector('a').innerText = this.title;
-		this.icon.dataset.id = id;
-		this.icon.id = 'deck' + id;
-
-		// view div that shows in deckDisplay
-		const viewTemplate = document.querySelector('#viewTemplate');
-		this.view = viewTemplate.cloneNode(true);
-		this.view.onclick = this.onClickView.bind(this);
-		this.view.id = 'view' + id;
-		this.view.querySelector('h3').innerText = this.title;
-		this.viewToggleFront = this.view.querySelector('.toggleFront');
-		this.viewToggleBack = this.view.querySelector('.toggleBack');
-
-		// test div that shows in deckDisplay
-		const testTemplate = document.querySelector('#testTemplate');
-		this.test = testTemplate.cloneNode(true);
-		this.test.onclick = this.onClickTest.bind(this);
-		this.test.id = 'test' + id;
-		this.testFront = this.test.querySelector('.testCardFront');
-		this.testFrontSecret = this.test.querySelector('.testCardSecretFront');
-		this.testBack = this.test.querySelector('.testCardBack');
-		this.testBackSecret = this.test.querySelector('.testCardSecretBack');
-
-		// edit div that lets you reset scores or adjusting scoring preferences
-		const editTemplate = document.querySelector('#editTemplate');
-		this.edit = editTemplate.cloneNode(true);
-		this.edit.onclick = this.onClickEdit.bind(this);
-		this.edit.id = 'edit' + id;
-
-		this.idn = this.edit.querySelector('.inputDeckName');
-		this.dn = this.edit.querySelector('.deckName');
-
-		this.dn.innerText = this.title;
-		this.idn.value = this.title;
-		this.editShuffleButtons = [];
-		for (let i = 1; i <= 5; i++) {
-			this.editShuffleButtons.push([]);
-			this.editShuffleButtons[i - 1].push(
-				this.edit.querySelector(`.shuffle-1${i}`)
-			);
-			this.editShuffleButtons[i - 1].push(
-				this.edit.querySelector(`.shuffleN${i}`)
-			);
-			this.editShuffleButtons[i - 1].push(
-				this.edit.querySelector(`.shuffle0${i}`)
-			);
-		}
-		this.refreshViewStats();
-		this.refreshEdit();
-
-		// alter div that lets you edit or add cards
-		const alterTemplate = document.querySelector('#alterTemplate');
-		this.alter = alterTemplate.cloneNode(true);
-		this.alter.onclick = this.onClickAlter.bind(this);
-		this.alter.id = 'alter' + id;
-		this.alterScrollBox = this.alter.querySelector('#scrollbox');
-		this.alterCardDetail = this.alter.querySelector('.alterCard');
-		this.alterFront = this.alter.querySelector('.alterCardFront');
-		this.alterBack = this.alter.querySelector('.alterCardBack');
-		this.refreshAlter();
+		this.icon.dataset.id = this.id;
+		this.icon.id = 'deck' + this.id;
 
 		storedDecks.storeDeck(this.title, this.dumpDeck());
 	}
 
-	refreshIcon() {
-		this.icon.querySelector('a').innerText = this.title;
+	// when the icon in the deckbar is clicked
+	onClickIcon(event) {
+		if (event.target.classList.contains('download')) {
+			// handle download if the download icon is hit
+			this.downloadFile();
+		} else {
+			let selectedDeck = 0;
+
+			// or clicked on the icon so handle coloration
+
+			[...deckBar.element.querySelectorAll('.deckIcon')].forEach((icon) => {
+				icon.classList.remove('toggleShowSelected');
+			});
+			[...deckBar.element.querySelectorAll('.deckText')].forEach((icon) => {
+				icon.classList.remove('toggleShowSelected');
+			});
+			const el = event.target;
+			el.classList.add('toggleShowSelected');
+			if (el.classList.contains('deckText')) {
+				el.parentElement.classList.add('toggleShowSelected');
+				selectedDeck = el.parentElement.dataset.id;
+			} else {
+				selectedDeck = el.dataset.id;
+			}
+
+			// and what to show here now that the icon is clicked
+			this.setNextCard();
+
+			viewDeck.showSelf();
+			viewDeck.refresh(this.id);
+			learnDeck.hideSelf();
+			viewCards.hideSelf();
+
+			navigation.setDeck(this.id);
+			navigation.element.querySelector('.viewDeckButton').click();
+		}
 	}
 
-	refreshAlter() {
-		let firstChild = this.alterScrollBox.firstElementChild;
-		while (firstChild) {
-			firstChild.remove();
-			firstChild = this.alterScrollBox.firstElementChild;
+	downloadFile() {
+		function SaveAsFile(t, f, m) {
+			try {
+				var b = new Blob([t], { type: m });
+				saveAs(b, f);
+			} catch (e) {
+				window.open('data:' + m + ',' + encodeURIComponent(t), '_blank', '');
+			}
 		}
 
-		let newCardDiv;
-		let delImage;
-		for (let i = 0; i < this.cards.length; i++) {
-			newCardDiv = document.createElement('div');
-			newCardDiv.innerText = this.cards[i].front;
-			newCardDiv.dataset.deckid = i;
-			newCardDiv.classList.add('scrollCard');
-			newCardDiv.classList.add('button');
-			delImage = document.createElement('img');
-			delImage.setAttribute('src', 'images/delete.png');
-			delImage.dataset.deckid = i;
-			delImage.style.width = '10px';
-			delImage.style.border = '0';
-			delImage.align = 'right';
-			delImage.style.margin = '5px';
-			delImage.classList.add('deleteCard');
-			newCardDiv.appendChild(delImage);
-			this.alterScrollBox.appendChild(newCardDiv);
-		}
+		SaveAsFile(
+			JSON.stringify(this.dumpDeck()),
+			this.title + '.json',
+			'text/plain;charset=utf-8'
+		);
 	}
 
 	addCard(front, back, score) {
@@ -201,196 +645,11 @@ class Deck {
 	resetCards() {
 		this.cards.forEach((card) => (card.score = 1));
 		storedDecks.storeDeck(this.title, this.dumpCards());
-		this.refreshViewStats();
-	}
-
-	downloadFile() {
-		function SaveAsFile(t, f, m) {
-			try {
-				var b = new Blob([t], { type: m });
-				saveAs(b, f);
-			} catch (e) {
-				window.open('data:' + m + ',' + encodeURIComponent(t), '_blank', '');
-			}
-		}
-
-		SaveAsFile(
-			JSON.stringify(this.dumpDeck()),
-			this.title + '.json',
-			'text/plain;charset=utf-8'
-		);
-	}
-
-	onClickIcon(event) {
-		if (event.target.classList.contains('download')) {
-			this.downloadFile();
-		} else {
-			[...deckBar.element.querySelectorAll('.deckIcon')].forEach((icon) => {
-				icon.classList.remove('toggleShowSelected');
-			});
-			[...deckBar.element.querySelectorAll('.deckText')].forEach((icon) => {
-				icon.classList.remove('toggleShowSelected');
-			});
-			const el = event.target;
-			el.classList.add('toggleShowSelected');
-			if (el.classList.contains('deckText')) {
-				el.parentElement.classList.add('toggleShowSelected');
-			}
-			deckDisplay.hideAll();
-			this.refreshViewStats();
-			this.view.classList.remove('hidden');
-		}
-	}
-
-	onClickView(event) {
-		const el = event.target;
-		if (el.classList.contains('learnButton')) {
-			deckDisplay.hideAll();
-			this.test.classList.remove('hidden');
-			this.showNextCard();
-		} else if (el.classList.contains('toggleFront')) {
-			this.viewToggleFront.classList.add('toggleShowSelected');
-			this.viewToggleBack.classList.remove('toggleShowSelected');
-			this.showQuestion = true;
-			storedDecks.storeDeck(this.title, this.dumpDeck());
-		} else if (el.classList.contains('toggleBack')) {
-			this.viewToggleFront.classList.remove('toggleShowSelected');
-			this.viewToggleBack.classList.add('toggleShowSelected');
-			this.showQuestion = false;
-			storedDecks.storeDeck(this.title, this.dumpDeck());
-		} else if (el.classList.contains('editButton')) {
-			// this.resetCards();
-			deckDisplay.hideAll();
-			this.edit.classList.remove('hidden');
-		}
-	}
-
-	onClickTest(event) {
-		// depending on where you click we will do things
-		event.preventDefault();
-		const el = event.target;
-
-		// click one of the buttons to grade your card
-		if (el.classList.contains('testResponseButton')) {
-			this.scoreCurrentCard(parseInt(el.innerText, 10));
-		} else if (el.classList.contains('testRevealButton')) {
-			this.revealCurrentCard(parseInt(el.innerText, 10));
-		} else if (el.classList.contains('editTestCard')) {
-			this.alterCard(this.cards.indexOf(this.currentCard));
-			deckDisplay.hideAll();
-			this.refreshAlter();
-			this.alter.classList.remove('hidden');
-		}
-	}
-
-	onClickEdit(event) {
-		if (event.target.classList.contains('toggleShuffle')) {
-			if (event.target.dataset.id == 'edit11') this.shuffle[0] = -1;
-			if (event.target.dataset.id == 'edit12')
-				this.shuffle[0] = parseInt(event.target.innerText, 10);
-			if (event.target.dataset.id == 'edit13') this.shuffle[0] = 0;
-
-			if (event.target.dataset.id == 'edit21') this.shuffle[1] = -1;
-			if (event.target.dataset.id == 'edit22')
-				this.shuffle[1] = parseInt(event.target.innerText, 10);
-			if (event.target.dataset.id == 'edit23') this.shuffle[1] = 0;
-
-			if (event.target.dataset.id == 'edit31') this.shuffle[2] = -1;
-			if (event.target.dataset.id == 'edit32')
-				this.shuffle[2] = parseInt(event.target.innerText, 10);
-			if (event.target.dataset.id == 'edit33') this.shuffle[2] = 0;
-
-			if (event.target.dataset.id == 'edit41') this.shuffle[3] = -1;
-			if (event.target.dataset.id == 'edit42')
-				this.shuffle[3] = parseInt(event.target.innerText, 10);
-			if (event.target.dataset.id == 'edit43') this.shuffle[3] = 0;
-
-			if (event.target.dataset.id == 'edit51') this.shuffle[4] = -1;
-			if (event.target.dataset.id == 'edit52')
-				this.shuffle[4] = parseInt(event.target.innerText, 10);
-			if (event.target.dataset.id == 'edit53') this.shuffle[4] = 0;
-		} else if (event.target.classList.contains('resetButton')) {
-			this.resetCards();
-		} else if (event.target.classList.contains('deleteButton')) {
-			this.deleteDeck();
-			return 'deleted';
-		} else if (event.target.classList.contains('alterButton')) {
-			deckDisplay.hideAll();
-			this.refreshAlter();
-			this.alter.classList.remove('hidden');
-		} else if (event.target.classList.contains('editDeckName')) {
-			this.editDeckName();
-		}
-
-		this.refreshEdit();
-		storedDecks.storeDeck(this.title, this.dumpDeck());
-	}
-
-	editDeckName(event) {
-		if (this.dn.classList.contains('hidden')) {
-			let oldTitle = this.title;
-			this.dn.classList.remove('hidden');
-			this.idn.classList.add('hidden');
-			this.title = this.idn.value;
-			this.refreshEdit();
-			this.refreshViewStats();
-			this.refreshAlter();
-			this.refreshIcon();
-			storedDecks.deleteDeck(oldTitle);
-		} else {
-			this.dn.classList.add('hidden');
-			this.idn.classList.remove('hidden');
-			this.idn.focus();
-			this.idn.selectionStart = this.idn.selectionEnd = this.idn.value.length;
-		}
-	}
-
-	onClickAlter(event) {
-		if (event.target.classList.contains('scrollCard')) {
-			this.alterCard(event.target.dataset.deckid);
-			[...this.alter.querySelectorAll('.scrollCard')].forEach((card) =>
-				card.classList.remove('toggleShowSelected')
-			);
-			event.target.classList.add('toggleShowSelected');
-		} else if (event.target.classList.contains('alterScoreButton')) {
-			if (parseInt(this.alterCardDetail.dataset.currentcard, 10) != -1) {
-				this.saveCard(
-					parseInt(this.alterCardDetail.dataset.currentcard, 10),
-					this.alterFront.value,
-					this.alterBack.value,
-					parseInt(event.target.innerText, 10)
-				);
-				this.refreshAlter();
-			} else {
-				this.addCard(
-					this.alterFront.value,
-					this.alterBack.value,
-					parseInt(event.target.innerText, 10)
-				);
-				this.refreshAlter();
-			}
-			this.startNewCard();
-		} else if (event.target.classList.contains('newButton')) {
-			this.startNewCard();
-			this.refreshAlter();
-		} else if (event.target.classList.contains('deleteCard')) {
-			this.deleteCard(event.target.dataset.deckid);
-			this.refreshAlter();
-			this.startNewCard();
-		}
 	}
 
 	deleteCard(cardId) {
 		this.cards.splice(cardId, 1);
-		this.refreshAlter();
 		storedDecks.storeDeck(this.title, this.dumpDeck());
-	}
-
-	startNewCard() {
-		this.alterCardDetail.dataset.currentcard = -1;
-		this.alterFront.value = '';
-		this.alterBack.value = '';
-		this.alterFront.focus();
 	}
 
 	saveCard(cardId, front, back, score) {
@@ -400,138 +659,12 @@ class Deck {
 		storedDecks.storeDeck(this.title, this.dumpDeck());
 	}
 
-	alterCard(cardId) {
-		this.alterCardDetail.dataset.currentcard = cardId;
-		this.alterFront.value = this.cards[cardId].front;
-		this.alterBack.value = this.cards[cardId].back;
-	}
-
-	deleteDeck() {
-		this.icon.classList.add('hidden');
-		this.view.classList.add('hidden');
-		this.edit.classList.add('hidden');
-		this.test.classList.add('hidden');
-		this.alter.classList.add('hidden');
-		storedDecks.deleteDeck(this.title);
-	}
-
-	onKeyup(event) {
-		let keyPressed = event.code;
-		let numPressed = keyPressed.charAt(keyPressed.length - 1);
-
-		if (!this.test.classList.contains('hidden')) {
-			if (this.getTestButtons() == 'reveal') {
-				this.revealCurrentCard();
-			} else if (['1', '2', '3', '4', '5'].includes(numPressed)) {
-				this.scoreCurrentCard(parseInt(numPressed, 10));
-			}
-		} else if (!this.alter.classList.contains('hidden')) {
-			let scoreButtons = [...this.alter.querySelectorAll('.alterScoreButton')];
-			if (
-				(keyPressed == 'NumpadEnter' || keyPressed == 'Enter') &&
-				scoreButtons.includes(document.activeElement)
-			) {
-				event.target.click();
-			}
-		}
-	}
-
 	cardsWithScore(searchScore) {
 		// function to have deck return cards with score
 		return this.cards.filter((card) => card.score === searchScore);
 	}
 
-	refreshViewStats() {
-		// counts
-		const count = [];
-		let countTotal = 0;
-		for (let i = 1; i <= 5; i++) {
-			const currentCount = this.cardsWithScore(i).length;
-			count.push(currentCount);
-			countTotal += currentCount;
-		}
-		const viewCounts = this.view.querySelectorAll('.viewCounts');
-		for (let i = 0; i < viewCounts.length; i++) {
-			viewCounts[i].innerText = i + 1 + ': ' + count[i];
-		}
-		viewCounts[viewCounts.length - 1].innerText = 'Total: ' + countTotal;
-
-		if (this.showQuestion) {
-			this.viewToggleFront.classList.add('toggleShowSelected');
-			this.viewToggleBack.classList.remove('toggleShowSelected');
-		} else {
-			this.viewToggleFront.classList.remove('toggleShowSelected');
-			this.viewToggleBack.classList.add('toggleShowSelected');
-		}
-	}
-
-	refreshEdit() {
-		this.dn.innerText = this.title;
-		this.idn.value = this.dn.innerText;
-		for (let i = 0; i <= 4; i++) {
-			for (let j = 0; j <= 2; j++) {
-				this.editShuffleButtons[i][j].classList.remove('toggleShowSelected');
-			}
-			if (this.shuffle[i] == -1) {
-				this.editShuffleButtons[i][0].classList.add('toggleShowSelected');
-			} else if (this.shuffle[i] == 0) {
-				this.editShuffleButtons[i][2].classList.add('toggleShowSelected');
-			} else {
-				this.editShuffleButtons[i][1].classList.add('toggleShowSelected');
-			}
-		}
-	}
-
-	setTestButtons(direction = 'reveal') {
-		// set to reveal or score
-		if (direction === 'reveal') {
-			this.test.querySelector('.testResponseGrades').classList.remove('hidden');
-			this.test.querySelector('.testRevealButton').classList.add('hidden');
-		} else {
-			this.test.querySelector('.testResponseGrades').classList.add('hidden');
-			this.test.querySelector('.testRevealButton').classList.remove('hidden');
-		}
-
-		if (direction === 'reveal') {
-			if (this.showQuestion) {
-				this.testBack.classList.remove('hidden');
-				this.testBackSecret.classList.add('hidden');
-				this.testFront.classList.remove('hidden');
-				this.testFrontSecret.classList.add('hidden');
-			} else {
-				this.testBack.classList.remove('hidden');
-				this.testBackSecret.classList.add('hidden');
-				this.testFront.classList.remove('hidden');
-				this.testFrontSecret.classList.add('hidden');
-			}
-		} else {
-			if (this.showQuestion) {
-				this.testBack.classList.add('hidden');
-				this.testBackSecret.classList.remove('hidden');
-				this.testFront.classList.remove('hidden');
-				this.testFrontSecret.classList.add('hidden');
-			} else {
-				this.testBack.classList.remove('hidden');
-				this.testBackSecret.classList.add('hidden');
-				this.testFront.classList.add('hidden');
-				this.testFrontSecret.classList.remove('hidden');
-			}
-		}
-	}
-
-	getTestButtons() {
-		// return reveal or score
-
-		if (
-			this.test.querySelector('.testRevealButton').classList.contains('hidden')
-		) {
-			return 'score';
-		} else {
-			return 'reveal';
-		}
-	}
-
-	showNextCard() {
+	setNextCard() {
 		// algorithm here to determine which card to show
 
 		let notFound = true;
@@ -586,20 +719,13 @@ class Deck {
 			}
 		}
 
-		if (notFound) {
+		if (notFound && this.cards.length > 0) {
 			modal.classList.remove('hidden');
 			this.currentCard = this.cards[0];
-			this.testFront.innerHTML = this.currentCard.front;
-			this.testBack.innerHTML = this.currentCard.back;
-			// hide answer and scoring buttons
-			this.setTestButtons('score');
 			return 1;
 		}
 
-		this.testFront.innerHTML = this.currentCard.front;
-		this.testBack.innerHTML = this.currentCard.back;
-		// hide answer and scoring buttons
-		this.setTestButtons('score');
+		return this.currentCard;
 	}
 
 	scoreCurrentCard(chosenScore) {
@@ -622,12 +748,7 @@ class Deck {
 		storedDecks.storeDeck(this.title, this.dumpDeck());
 
 		// do another
-		this.showNextCard();
-	}
-
-	// reveal answer and scoring buttons
-	revealCurrentCard() {
-		this.setTestButtons('reveal');
+		this.setNextCard();
 	}
 
 	pushBackCard(cardToPush, howFarBack) {
@@ -646,6 +767,40 @@ class Deck {
 			j = this.cards.indexOf(cardToPush);
 		}
 	}
+
+	onKeyup(event) {
+		let keyPressed = event.code;
+		let numPressed = keyPressed.charAt(keyPressed.length - 1);
+
+		if (!learnDeck.element.classList.contains('hidden')) {
+			if (
+				!learnDeck.element
+					.querySelector('.learnDeckRevealButton')
+					.classList.contains('hidden') &&
+				keyPressed == 'Space'
+			) {
+				learnDeck.element.querySelector('#reveal').click();
+			} else if (['1', '2', '3', '4', '5'].includes(numPressed)) {
+				if (numPressed === '1') {
+					learnDeck.element.querySelector('#res1').click();
+				} else if (numPressed === '2') {
+					learnDeck.element.querySelector('#res2').click();
+				} else if (numPressed === '3') {
+					learnDeck.element.querySelector('#res3').click();
+				} else if (numPressed === '4') {
+					learnDeck.element.querySelector('#res4').click();
+				} else if (numPressed === '5') {
+					learnDeck.element.querySelector('#res5').click();
+				}
+			}
+		}
+		// else if (!viewCards.element.classList.contains('hidden')) {
+		// 	console.log('viewcards');
+		// 	console.log(keyPressed);
+
+		// 	console.log(numPressed);
+		// }
+	}
 }
 
 class Card {
@@ -655,23 +810,6 @@ class Card {
 		this.score = score;
 	}
 }
-
-const modal = document.querySelector('#modal');
-
-////////////////////////////////////////////////
-//
-// modal Functions
-//
-////////////////////////////////////////////////
-
-modal.addEventListener('click', function (event) {
-	event.preventDefault();
-	if (event.target.id === 'close') {
-		modal.classList.add('hidden');
-	}
-});
-
-let decks = [];
 
 class Storage {
 	constructor(initialDeck) {
@@ -753,8 +891,8 @@ class Book {
 		let tempDeck = new Deck(this.counter, newDeck);
 		this.decks.push(tempDeck);
 
+		// add icon to the deckbar
 		deckBar.addDeck(tempDeck);
-		deckDisplay.addDeck(tempDeck);
 	}
 
 	getDecks() {
@@ -762,24 +900,37 @@ class Book {
 	}
 }
 
-let templateDeck = {
-	detail: {
-		title: 'New Deck',
-		shuffle: [-1, -1, 5, 5, 0],
-		showQuestion: true,
-	},
-	cards: [],
-};
+const modal = document.querySelector('#modal');
+
+////////////////////////////////////////////////
+//
+// modal Functions
+//
+////////////////////////////////////////////////
+
+modal.addEventListener('click', function (event) {
+	event.preventDefault();
+	if (event.target.id === 'close') {
+		modal.classList.add('hidden');
+	}
+});
+
+const navigation = new Navigation('navigation');
 
 const deckBar = new DeckBar();
-const deckDisplay = new DeckDisplay();
+const display = new Display();
 const storedDecks = new Storage(uscapitals); // pass default deck in case that this is a new run or cleared mem
+const viewDeck = new ViewDeck('viewDeck');
 const book = new Book(storedDecks);
+const learnDeck = new LearnDeck('learnDeck');
+const viewCards = new ViewCards('viewCards');
 
 deckBar.activateCreateNew();
 
 document.querySelector('body').addEventListener('keyup', (event) => {
 	book.getDecks().forEach((deck) => {
-		deck.onKeyup(event);
+		if (navigation.deckid == deck.id) {
+			deck.onKeyup(event);
+		}
 	});
 });
